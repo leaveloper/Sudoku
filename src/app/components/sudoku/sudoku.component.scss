@@ -1,0 +1,66 @@
+* {
+  --border-radius: 15px;
+  --inner-border-radius: calc(var(--border-radius) - 5px);
+  --inner-border-radius-input: calc(var(--border-radius) - 7px);
+  --box-size: 40px;
+}
+
+.container {
+  border-radius: var(--border-radius);
+  border: 3px solid orange;
+}
+
+.inner-container {
+  border: 2px solid orange;
+}
+
+.box {
+  border: 1px dashed orange;
+}
+
+.top-left-corner {
+  border-top-left-radius: var(--inner-border-radius);
+
+  input.top-left-corner {
+    border-top-left-radius: var(--inner-border-radius-input);
+  }
+}
+
+.top-right-corner {
+  border-top-right-radius: var(--inner-border-radius);
+
+  input.top-right-corner {
+    border-top-right-radius: var(--inner-border-radius-input);
+  }
+}
+
+.bottom-left-corner {
+  border-bottom-left-radius: var(--inner-border-radius);
+
+  input.bottom-left-corner {
+    border-bottom-left-radius: var(--inner-border-radius-input);
+  }
+}
+
+.bottom-right-corner {
+  border-bottom-right-radius: var(--inner-border-radius);
+
+  input.bottom-right-corner {
+    border-bottom-right-radius: var(--inner-border-radius-input);
+  }
+}
+
+input {
+  width: var(--box-size);
+  height: var(--box-size);
+  text-align: center;
+  border: none;
+  font-size: 20px;
+  font-family: 'Trebuchet MS';
+  background-color: transparent;
+
+}
+
+input[type=number]{
+  appearance: textfield;
+}
