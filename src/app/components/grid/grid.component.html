@@ -1,0 +1,7 @@
+<div class="container" [style.gridTemplateColumns]="gridContainerTemplateCols" [style.gridTemplateRows]="gridContainerTemplateRows">
+  @for (rowGrid of rangeRows; track 'r' + rowGrid; let fr = $first; let lr = $last; let ir = $index) {
+    @for (colGrid of rangeCols; track 'c' + colGrid; let fc = $first; let lc = $last; let ic = $index) {
+      <ng-container #content [ngTemplateOutlet]="contentTemplate.template"></ng-container>
+    }
+  }
+</div>
