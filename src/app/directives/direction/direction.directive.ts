@@ -19,8 +19,10 @@ export class DirectionDirective implements OnInit {
     this.style = '';
   }
 
-  ngOnInit(): void {    
-    switch (this.getSelector()) {
+  ngOnInit(): void {   
+    const selectorList: string[] = this.getSelectors();
+
+    switch (selectorList[0]) {
       case 'top':
         this.style = this.getTopStyle();
         break;
@@ -38,11 +40,18 @@ export class DirectionDirective implements OnInit {
         break;
     }
 
+    if (selectorList[1]) {
+      if (selectorList[0] === 'top' || selectorList[0] === 'bottom')
+        this.style += this.horizontalCenteringStyle();
+      else if (selectorList[0] !== 'center')
+        this.style += this.vericalCenteringStyle();
+    }
+
     this.setStyle();
   }
 
-  getSelector() {
-    return [...selectors].filter(s => this.attrs.getNamedItem(s))[0];
+  getSelectors() {
+    return [...selectors].filter(s => this.attrs.getNamedItem(s));
   }
 
   private setStyle() {
@@ -63,6 +72,14 @@ export class DirectionDirective implements OnInit {
 
   private getLeftStyle() {
     return this.commonStyle() + `justify-content: left;`;
+  }
+
+  private horizontalCenteringStyle() {
+    return `justify-content: center`;
+  }
+
+  private vericalCenteringStyle() {
+    return `align-items: center;`;
   }
 
   private getCenterStyle() {
