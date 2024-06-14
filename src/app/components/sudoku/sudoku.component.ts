@@ -1,13 +1,12 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, Output, Renderer2 } from '@angular/core';
 import { GridComponent } from '../grid/grid.component';
-import { CenterDirective } from '../../directives/center/center.directive';
 import { GridContentDirective } from '../../directives/grid-content/grid-content.directive';
 import { SudokuService } from '../../services/sudoku.service';
 
 @Component({
   selector: 'sudoku',
   standalone: true,
-  imports: [GridComponent, CenterDirective, GridContentDirective],
+  imports: [GridComponent, GridContentDirective],
   templateUrl: './sudoku.component.html',
   styleUrl: './sudoku.component.scss'
 })
@@ -63,7 +62,6 @@ export class SudokuComponent implements OnInit, AfterViewInit {
     let countIndex: number = 0;
 
     let cellRowIndex: number = 0;
-    let cellOuterColIndex: number;
     let cellColIndex: number = 0;
 
     let topRightCornerIndex: number = this.cells / this.cols;
@@ -72,7 +70,7 @@ export class SudokuComponent implements OnInit, AfterViewInit {
 
     const bottomLetCornerIndex:number = this.getNumber((this.outerRowGrid * this.outerColGrid) - this.outerColGrid);
 
-    this.elementRef.nativeElement.querySelector('.container').querySelector('.container').querySelectorAll('.inner-container').forEach((e: HTMLElement, i: number, array: Array<HTMLElement>) => {      
+    this.elementRef.nativeElement.querySelectorAll('.inner-container').forEach((e: HTMLElement, i: number, array: Array<HTMLElement>) => {      
       if (i > 0 && (i === 1 || i !== prevNumber + 1)) { // Salvo el 1, los siguientes elementos no son consecutivos. Cada elemento es el siguiente índice más uno        
         let inputIndex = 0;
         countIndex++;

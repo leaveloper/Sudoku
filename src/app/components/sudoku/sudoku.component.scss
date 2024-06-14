@@ -8,6 +8,7 @@
 .container {
   border-radius: var(--border-radius);
   border: 3px solid orange;
+  display: inline-block; // Coloca el borde correctamente
 }
 
 .inner-container {
