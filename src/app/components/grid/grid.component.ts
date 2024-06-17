@@ -1,4 +1,4 @@
-import { AfterContentInit, AfterViewInit, Component, ContentChild, ElementRef, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ContentChild, ElementRef, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { generateRange } from '../../utils'
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 import { GridContentDirective } from '../../directives/grid-content/grid-content.directive';
@@ -7,10 +7,11 @@ import { GridContentDirective } from '../../directives/grid-content/grid-content
   selector: 'grid',
   standalone: true,
   imports: [NgClass, NgTemplateOutlet],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './grid.component.html',
   styleUrl: './grid.component.scss',
 })
-export class GridComponent implements OnInit, AfterViewInit, AfterContentInit  {
+export class GridComponent implements OnInit {
   @Input() rows: number;
   @Input() cols: number;
   @Input() cells: number;
@@ -38,20 +39,18 @@ export class GridComponent implements OnInit, AfterViewInit, AfterContentInit  {
   }
 
   ngOnInit(): void {
+    this.initialize();
+  }
+
+  ngOnChanges(): void {
+    this.initialize();
+  }
+
+  initialize() {
     this.rangeRows = generateRange(0, this.rows);
     this.rangeCols = generateRange(0, this.cols);
 
     this.setGridContainerTemplates();
-  }
-
-  ngAfterViewInit(): void {
-    // this.elements.forEach(element => {
-    //   const el = element.nativeElement.previousElementSibling;
-    //   el.classList.add('box')
-    // });
-  }
-
-  ngAfterContentInit(): void {
   }
 
   setGridContainerTemplates() {
