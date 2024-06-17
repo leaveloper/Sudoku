@@ -1,5 +1,5 @@
 <sudoku center [rows]="rows" [cols]="cols"/>
-<edge-button top center [label]="'-'" (event)="remove('row')" [key]="'ArrowUp'" />
-<edge-button right center [label]="'+'" (event)="add('col')" [key]="'ArrowRight'" />
-<edge-button bottom center [label]="'+'" (event)="add('row')" [key]="'ArrowDown'" />
-<edge-button left center [label]="'-'" (event)="remove('col')" [key]="'ArrowLeft'" />
+<edge-button top center [label]="'-'" (event)="remove('row')" [key]="'ArrowUp'" [disabled]="disableDict.top" tooltip="Eliminar fila"/>
+<edge-button right center [label]="'+'" (event)="add('col')" [key]="'ArrowRight'" [disabled]="disableDict.right" tooltip="Añadir columna"/>
+<edge-button bottom center [label]="'+'" (event)="add('row')" [key]="'ArrowDown'" [disabled]="disableDict.bottom" tooltip="Añadir fila"/>
+<edge-button left center [label]="'-'" (event)="remove('col')" [key]="'ArrowLeft'" [disabled]="disableDict.left" tooltip="Eliminar columna"/>
