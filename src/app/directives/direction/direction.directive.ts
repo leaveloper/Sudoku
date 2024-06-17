@@ -59,27 +59,37 @@ export class DirectionDirective implements OnInit {
   }
 
   private getTopStyle() {
-    return this.commonStyle() + `align-items: start;`;
+    return `position: absolute;
+    top: 0;
+    `;
   }
 
   private getRightStyle() {
-    return this.commonStyle() + `justify-content: right;`;
+    return `position: absolute;
+    right: 0;
+    `;
   }
 
   private getBottomStyle() {
-    return this.commonStyle() + `align-items: end;`;
+    return `position: absolute;
+    bottom: 0;
+    `;
   }
 
   private getLeftStyle() {
-    return this.commonStyle() + `justify-content: left;`;
+    return `position: absolute;
+    left: 0;
+    `;
   }
 
   private horizontalCenteringStyle() {
-    return `justify-content: center`;
+    return `left: 50%;
+    transform: translateX(-50%)`;
   }
 
   private vericalCenteringStyle() {
-    return `align-items: center;`;
+    return `top: 50%;
+    transform: translateY(-50%)`;
   }
 
   private getCenterStyle() {
@@ -88,11 +98,5 @@ export class DirectionDirective implements OnInit {
     left: 50%;
     transform: translate(-50%, -50%);
     `;
-  }
-
-  private commonStyle() {
-    return `width: 100vw;
-    height: 100vh;
-    display: flex;`;
   }
 }
