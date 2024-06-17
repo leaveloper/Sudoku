@@ -4,7 +4,7 @@ import { EdgeButtonComponent } from '../edge-button/edge-button.component';
 import { DirectionDirective } from '../../directives/direction/direction.directive';
 
 @Component({
-  selector: 'app-game-board',
+  selector: 'game-board',
   standalone: true,
   imports: [SudokuComponent, EdgeButtonComponent, DirectionDirective],
   templateUrl: './game-board.component.html',
