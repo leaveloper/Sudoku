@@ -1,0 +1,5 @@
+<sudoku center [rows]="rows" [cols]="cols"/>
+<edge-button top center [label]="'-'" (event)="remove('row')" [key]="'ArrowUp'" />
+<edge-button right center [label]="'+'" (event)="add('col')" [key]="'ArrowRight'" />
+<edge-button bottom center [label]="'+'" (event)="add('row')" [key]="'ArrowDown'" />
+<edge-button left center [label]="'-'" (event)="remove('col')" [key]="'ArrowLeft'" />
