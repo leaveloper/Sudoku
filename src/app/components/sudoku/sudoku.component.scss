@@ -3,20 +3,21 @@
   --inner-border-radius: calc(var(--border-radius) - 5px);
   --inner-border-radius-input: calc(var(--border-radius) - 7px);
   --box-size: 40px;
+  --color: #0353A4;
 }
 
 .container {
   border-radius: var(--border-radius);
-  border: 3px solid orange;
+  border: 3px solid var(--color);
   display: inline-block; // Coloca el borde correctamente
 }
 
 .inner-container {
-  border: 2px solid orange;
+  border: 2px solid var(--color);
 }
 
 .box {
-  border: 1px dashed orange;
+  border: 1px dashed var(--color);
 }
 
 .top-left-corner {

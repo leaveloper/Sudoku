@@ -120,7 +120,13 @@ export class SudokuComponent implements OnInit, AfterViewInit {
 
       let counterCellColIndex = 0;
       Array.from(element.querySelectorAll('input')).forEach((ei: HTMLInputElement) => {
-        ei.value = this.arr[cellRowIndex][cellColIndex].toString();
+        const value: string = this.arr[cellRowIndex][cellColIndex].toString();
+
+        if (value !== '0') {
+          ei.value = value;
+          this.renderer.setAttribute(ei, 'disabled', 'true');
+        }
+
         cellColIndex++;
         counterCellColIndex++;
         if (counterCellColIndex >= this.innerColGrid){
@@ -155,6 +161,8 @@ export class SudokuComponent implements OnInit, AfterViewInit {
 
       Array.from(element.querySelectorAll('input')).forEach((input: HTMLInputElement) => {
         this.removeCornerClasses(input);
+        input.value = '';
+        this.renderer.removeAttribute(input, 'disabled');
       });
     });
   }
