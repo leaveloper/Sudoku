@@ -13,22 +13,26 @@ export class EdgeButtonComponent implements AfterViewInit {
 
   @Input() label: string;
   @Input() key: string;
+  @Input() disabled: boolean;
+  @Input() tooltip: string;
 
   @Output() event = new EventEmitter<void>();
 
   constructor(private renderer: Renderer2, private directive: DirectionDirective) { 
     this.label = '';
     this.key = '';
+    this.disabled = false;
+    this.tooltip = '';
   }
   
-  @HostListener('click', ['$event']) // TODO Añadir que tambien pueda activarse por una tecla y que reciba cual
+  @HostListener('click', ['$event'])
   handleClick(): void {
     this.event.emit();
   }
 
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(keyboardEvent: KeyboardEvent) {
-    if (keyboardEvent.key === this.key)
+    if (!this.disabled && keyboardEvent.key === this.key)
       this.event.emit();
   }
 

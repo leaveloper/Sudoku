@@ -1,18 +1,26 @@
+* {
+  --background-color: #B9D6F2;
+  --color: #003559;
+}
+
 .box {
   box-sizing: border-box;
-  background: radial-gradient(circle, rgb(9, 209, 149) 0%, rgba(0, 0, 0, 0) 90%);
+  background: radial-gradient(circle, var(--background-color) 0%, rgba(0, 0, 0, 0) 90%);
   opacity: 15%;
   transition: opacity .5s;
   border: none;
   display: flex;
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none; /* IE 10 and IE 11 */
+  -webkit-user-select: none;
+  -ms-user-select: none;
   user-select: none;
-  cursor: pointer;
-  color: rgb(4, 114, 81);
+  color: var(--color);
 }
 
-.box:hover {
+.box:not(:disabled) {
+  cursor: pointer;  
+}
+
+.box:hover:not(:disabled) {
   opacity: 100%;
 }
 
