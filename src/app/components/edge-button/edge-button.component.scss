@@ -1,12 +1,19 @@
 .box {
   box-sizing: border-box;
-  background-color: red;
-  border: 1px solid black;
+  background: radial-gradient(circle, rgb(9, 209, 149) 0%, rgba(0, 0, 0, 0) 90%);
+  opacity: 15%;
+  transition: opacity .5s;
+  border: none;
   display: flex;
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none;
   cursor: pointer;
+  color: rgb(4, 114, 81);
+}
+
+.box:hover {
+  opacity: 100%;
 }
 
 .symbol {
