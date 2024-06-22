@@ -11,7 +11,7 @@ export class SudokuService {
   private arr: number[][];
   private possibleNumbers: number[];
 
-  private emptyCells: number;
+  private notEmptyCells: number;
   private possibleCells: [number, number][];
 
   constructor() {
@@ -21,13 +21,15 @@ export class SudokuService {
     this.arr = [];
     this.possibleNumbers = [];
 
-    this.emptyCells = 0;
+    this.notEmptyCells = 0;
     this.possibleCells = [];
   }
 
   setSize(rows: number, cols: number) {
     this.rows = rows;
     this.cols = cols;
+
+    this.fillPossibleNumbers();
   }
 
   private initialize() {
@@ -37,10 +39,17 @@ export class SudokuService {
       this.arr[i] = Array.from(Array(arrLength), () => 0);
     }
 
-    const minEmptyCells = Math.floor(Math.log10(arrLength) * arrLength + arrLength);
-    const maxEmptyCells = Math.floor(minEmptyCells / 2);
+    const minNotEmptyCells = Math.floor(Math.log10(arrLength) * arrLength + arrLength);
+    const minCellsToBeRemoved = Math.floor(minNotEmptyCells / 2);
 
-    this.emptyCells = getRandomRange(minEmptyCells, maxEmptyCells);
+    const maxNotEmptyCells = minNotEmptyCells + minCellsToBeRemoved;
+
+    if (arrLength >= 9)
+      this.notEmptyCells = getRandomRange(65, 73);
+    else
+    this.notEmptyCells = getRandomRange(maxNotEmptyCells, maxNotEmptyCells + minCellsToBeRemoved);
+
+    this.fillPossibleCells();
   }
 
   private fillPossibleNumbers() {
@@ -57,28 +66,24 @@ export class SudokuService {
     }
   }
 
-  generate() {
+  async generate(): Promise<number[][]> {
     this.initialize();
-    this.fillPossibleNumbers();
-    this.fillPossibleCells();
 
-    this.arr = this.solve(this.arr);
-
+    this.solve(this.arr);
+    
     let arr: number[][] = [];
-    let done = false;
-    while (!done) {
-      arr = structuredClone(this.arr);
-      done = this.removeCells(arr);
-    }
+
+    arr = structuredClone(this.arr);
+    this.removeCells(arr);
 
     return arr;
   }
 
   //#region Solve
-  private solve(arr: number[][], row: number = 0, col: number = 0): number[][] {
+  private solve(arr: number[][], row: number = 0, col: number = 0): boolean {
     const emptyCell: number[] = this.getEmptyCell(arr, row, col);
     if (emptyCell.length === 0)
-      return arr;
+      return true;
 
     row = emptyCell[0];
     col = emptyCell[1];
@@ -90,8 +95,8 @@ export class SudokuService {
       if (this.checkLocation(arr, row, col, number)) {
         arr[row][col] = number;
 
-        if (this.solve(arr, row, col + 1).length > 0)
-          return arr;
+        if (this.solve(arr, row, col + 1))
+          return true;
 
         arr[row][col] = 0;
       }
@@ -101,7 +106,7 @@ export class SudokuService {
       number = this.getNumber(this.possibleNumbers.filter(n => !list.includes(n)));
     }
 
-    return [];
+    return false;
   }
 
   private getEmptyCell(arr: number[][], row: number, col: number) {
@@ -178,50 +183,59 @@ export class SudokuService {
 
   //#region Remove numbers
   private removeCells(arr: number[][]): boolean {
-    const emptyCellsList = this.getEmptyCells(arr);
-    if (emptyCellsList.length === this.emptyCells)
+    const notEmptyCells = this.getNotEmptyCells(arr);
+    if (notEmptyCells === this.notEmptyCells)
       return true;
 
-    const cells: [number, number] = this.getCell(emptyCellsList);
+    const cells: [number, number] = this.getCell();
     const number: number = arr[cells[0]][cells[1]];
 
-    if (this.solve(arr).length > 0) {
-      if (arr.toString() === this.arr.toString()) {
-        for (const cell of emptyCellsList) {
-          arr[cell[0]][cell[1]] = 0;
-        }
+    this.possibleCells.splice(this.possibleCells.findIndex(cell => 
+      cell[0] === cells[0] && cell[1] === cells[1]), 1);
 
-        arr[cells[0]][cells[1]] = 0;
+    arr[cells[0]][cells[1]] = 0;
 
-        return this.removeCells(arr);
-      }
-
-      return false;
+    const newArr = structuredClone(arr);
+    
+    if (this.solve(newArr) && this.compareArray(newArr)) {
+      if (this.removeCells(arr))
+        return true;
     }
 
     arr[cells[0]][cells[1]] = number;
+    this.possibleCells.push(cells);
 
-    return false;
+    return this.removeCells(arr);
   }
 
-  private getEmptyCells(arr: number[][]) {
-    const list: [number, number][] = [];
+  private getNotEmptyCells(arr: number[][]) {
+    let notEmptyCells = 0;
 
     for (let row = 0; row < arr.length; row++) {
       for (let col = 0; col < arr.length; col++) {
-        if (arr[row][col] === 0)
-          list.push([row, col])
+        if (arr[row][col] !== 0)
+          notEmptyCells++;
       }
     }
 
-    return list;
+    return notEmptyCells;
   }
 
-  private getCell(list?: [number, number][]) {
-    const newList: [number, number][] = this.possibleCells.filter(n => !list?.includes(n))
+  private getCell() {
+    let index: number = Math.floor(Math.random() * this.possibleCells.length);
+    return this.possibleCells[index];
+  }
 
-    let index: number = Math.floor(Math.random() * newList.length);
-    return newList[index];
+  private compareArray(arr: number[][]) {
+    for (let i = 0; i < this.arr.length; i++) {
+      for (let j = 0; j < this.arr.length; j++) {
+        if (this.arr[i][j] !== arr[i][j]) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
   //#endregion
 }
