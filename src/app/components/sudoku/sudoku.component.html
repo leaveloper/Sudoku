@@ -1,5 +1,5 @@
-<grid #container class="container" [rows]="outerRowGrid" [cols]="outerColGrid">
-  <grid class="inner-container" *gridContent [rows]="innerRowGrid" [cols]="innerColGrid">
+<grid #container class="container" [rows]="outerRowGrid" [cols]="outerColGrid" (gridInitialized)="onGridInitialized()">
+  <grid class="inner-container" *gridContent [rows]="innerRowGrid" [cols]="innerColGrid" (gridInitialized)="onGridInitialized()">
     <input type="number" *gridContent class="box" />
   </grid>
 </grid>

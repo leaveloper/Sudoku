@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { GridComponent } from '../grid/grid.component';
 import { GridContentDirective } from '../../directives/grid-content/grid-content.directive';
 import { SudokuService } from '../../services/sudoku.service';
@@ -13,7 +13,7 @@ import { EdgeButtonComponent } from '../edge-button/edge-button.component';
   templateUrl: './sudoku.component.html',
   styleUrl: './sudoku.component.scss'
 })
-export class SudokuComponent implements OnInit, AfterViewInit {
+export class SudokuComponent implements OnInit, AfterViewInit, AfterViewChecked {
   @Input() rows: number;
   @Input() cols: number;
 
@@ -27,6 +27,10 @@ export class SudokuComponent implements OnInit, AfterViewInit {
   private arr: number[][];
 
   private process: boolean;
+  private debounceTimer: any;
+  private gridInitializedCount: number;
+
+  private debouncedGenerateBoard = this.debounce(() => this.generateBoard(), 300);
 
   @ViewChild('container', { static: false }) container!: GridComponent;
 
@@ -44,10 +48,11 @@ export class SudokuComponent implements OnInit, AfterViewInit {
     this.innerColGrid = 1;
 
     this.process = false;
+    this.gridInitializedCount = 0;
   }
   
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['rows'] && !changes['rows'].isFirstChange() || changes['cols'] && !changes['cols'].isFirstChange()) {
+    if ((changes['rows'] && !changes['rows'].isFirstChange()) || (changes['cols']  && !changes['cols'].isFirstChange())) {
       this.initialize();
       this.process = true;
     }
@@ -56,15 +61,29 @@ export class SudokuComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.initialize();
   }
-    
+
+  onGridInitialized(): void {
+    this.gridInitializedCount++;
+  }
+
   ngAfterViewInit(): void {
-    this.fill();
+    this.postGridInitialized(false);
   }
 
   ngAfterViewChecked(): void {
     if (this.process) {
-      this.fill();
-      this.process = false;
+      this.postGridInitialized();
+    }
+  }
+
+  postGridInitialized(debouce: boolean = true): void {
+    if (this.gridInitializedCount > 0) {
+      this.gridInitializedCount = 0;
+      this.stylizeBoard();
+      if (debouce)
+        this.debouncedGenerateBoard();
+      else
+        this.generateBoard();
     }
   }
 
@@ -73,19 +92,21 @@ export class SudokuComponent implements OnInit, AfterViewInit {
     this.outerRowGrid = this.cells !== this.rows ? this.cells / this.rows : this.cells;
     this.outerColGrid = this.cells !== this.cols ? this.cells / this.cols : this.cells;
     this.innerRowGrid = this.cells / this.outerRowGrid;
-    this.innerColGrid = this.cells / this.outerColGrid;
+    this.innerColGrid = this.cells / this.outerColGrid;    
+  }
 
+  generateBoard(): void {
     this.sudokuService.setSize(this.rows, this.cols);
-    this.arr = this.sudokuService.generate();
+    this.sudokuService.generate().then((arr) => {
+      this.fillBoard(arr);
+    })
+    
     // TODO Evaluar si debería generar el arreglo inmediatamente
     // o sería mejor colocar un botón de generar
-  }  
+  }
 
-  fill() {
+  stylizeBoard() {
     this.resetStyle()
-
-    let cellRowIndex: number = 0;
-    let cellColIndex: number = 0;
 
     this.container.elements.forEach((el: ElementRef<HTMLElement>, i: number, array: Array<ElementRef<HTMLElement>>) => {
       const element: HTMLElement = el.nativeElement.previousElementSibling as HTMLElement;
@@ -115,12 +136,29 @@ export class SudokuComponent implements OnInit, AfterViewInit {
       if (className.length > 0)
         this.addClass(element, className, inputIndex);
 
+      if (this.outerRowGrid * this.outerColGrid === 1) {
+        this.addClass(element, 'top-left-corner', 0);
+        this.addClass(element, 'top-right-corner', 0);
+        this.addClass(element, 'bottom-left-corner', 0);
+        this.addClass(element, 'bottom-right-corner', 0);
+        return;
+      }
+    })
+  }
+
+  fillBoard(arr: number[][]) {    
+    let cellRowIndex: number = 0;
+    let cellColIndex: number = 0;
+    
+    let counterCellColIndex = 0;
+    this.container.elements.forEach((el: ElementRef<HTMLElement>) => {
+      const element: HTMLElement = el.nativeElement.previousElementSibling as HTMLElement;
+      
       const prevCellColIndex = cellColIndex;
       const prevCellRowIndex = cellRowIndex;
 
-      let counterCellColIndex = 0;
       Array.from(element.querySelectorAll('input')).forEach((ei: HTMLInputElement) => {
-        const value: string = this.arr[cellRowIndex][cellColIndex].toString();
+        const value: string = arr[cellRowIndex][cellColIndex].toString();
 
         if (value !== '0') {
           ei.value = value;
@@ -143,15 +181,7 @@ export class SudokuComponent implements OnInit, AfterViewInit {
         if (cellRowIndex >= this.innerRowGrid)
           cellRowIndex = prevCellRowIndex;
       }
-
-      if (this.outerRowGrid * this.outerColGrid === 1) {
-        this.addClass(element, 'top-left-corner', 0);
-        this.addClass(element, 'top-right-corner', 0);
-        this.addClass(element, 'bottom-left-corner', 0);
-        this.addClass(element, 'bottom-right-corner', 0);
-        return;
-      }
-    })
+    });
   }
 
   resetStyle() {
@@ -187,5 +217,14 @@ export class SudokuComponent implements OnInit, AfterViewInit {
   addClass(e: HTMLElement, className: string, index: number) {
     this.renderer.addClass(e, className);
     this.renderer.addClass(e.querySelectorAll('input')[index], className);
+  }
+
+  debounce(func: Function, delay: number): () => void {
+    return () => {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(() => {
+        func.apply(this);
+      }, delay);
+    };
   }
 }
