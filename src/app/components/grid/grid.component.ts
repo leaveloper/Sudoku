@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ContentChild, ElementRef, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewChecked, ChangeDetectionStrategy, Component, ContentChild, ElementRef, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { generateRange } from '../../utils'
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 import { GridContentDirective } from '../../directives/grid-content/grid-content.directive';
@@ -11,14 +11,15 @@ import { GridContentDirective } from '../../directives/grid-content/grid-content
   templateUrl: './grid.component.html',
   styleUrl: './grid.component.scss',
 })
-export class GridComponent implements OnInit {
+export class GridComponent implements OnInit, AfterViewChecked {
   @Input() rows: number;
   @Input() cols: number;
-  @Input() cells: number;
 
   @ViewChildren('content') elements!: QueryList<ElementRef>;
 
   @ContentChild(GridContentDirective) contentTemplate!: GridContentDirective;
+
+  @Output() gridInitialized = new EventEmitter<void>();
 
   rangeRows: number[];
   rangeCols: number[];
@@ -29,7 +30,6 @@ export class GridComponent implements OnInit {
   constructor () {
     this.rows = 1;
     this.cols = 1;
-    this.cells = 1;
 
     this.rangeRows = [];
     this.rangeCols = [];
@@ -44,6 +44,10 @@ export class GridComponent implements OnInit {
 
   ngOnChanges(): void {
     this.initialize();
+  }
+  
+  ngAfterViewChecked(): void {
+    this.gridInitialized.emit();
   }
 
   initialize() {
